@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gregory Sachs | Executive Profile & Strengths Analysis</title>
+    <title>Gregory Sachs | Executive Intelligence Dashboard</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,20 +12,19 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
 
     <!-- Application Configuration -->
     <!-- Chosen Palette: Warm Professional (Sand/Charcoal/Gold) -->
-    <!-- Application Structure Plan: A dashboard layout focusing on the "Duality" of the candidate. 
-         1. Hero: Synthesis of the Profile.
-         2. Strategic Radar: Interactive exploration of the 5 Pillars.
-         3. Inventory: Filterable grid of specific traits.
-         4. Evidence Log: Contextual backing. -->
-    <!-- Visualization & Content Choices: 
-         - Radar Chart: Best for showing the multi-dimensional nature of the candidate (Executive vs. Operator).
-         - Interactive Cards: To handle the dense textual evidence without overwhelming the user.
-         - CSS Grid: For the inventory to ensure responsiveness. 
-         - NO SVG/Mermaid used. -->
+    <!-- Application Structure Plan: "One-Sheet Executive Dashboard"
+         - Layout: Asymmetric Bento Grid (Sidebar + Main Content).
+         - Goal: Maximum information density with minimal scroll. 
+         - Logic: 
+            1. Sidebar: Anchors identity (Head/Hands/Heart).
+            2. Top Main: Visual Strategy (Radar) + Dynamic Intelligence Panel (Context).
+            3. Bottom Main: Tabbed Capabilities Matrix (Compact Strengths Inventory).
+         - Interaction: Clicking Radar updates Intelligence Panel. Clicking Tabs filters Inventory.
+    -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 
     <script>
@@ -34,10 +33,10 @@
                 extend: {
                     colors: {
                         primary: '#2C3E50',    // Charcoal Blue
-                        secondary: '#E5E7EB',  // Light Gray
+                        secondary: '#F3F4F6',  // Light Gray
                         accent: '#D4AF37',     // Muted Gold
-                        bg: '#F9FAFB',         // Off-white
-                        surface: '#FFFFFF',    // White
+                        bg: '#FFFFFF',         // White
+                        surface: '#F9FAFB',    // Off-white
                         text: '#374151',       // Gray-700
                     },
                     fontFamily: {
@@ -51,288 +50,281 @@
 
     <style>
         body {
-            background-color: #F3F4F6;
+            background-color: #F8FAFC;
             color: #374151;
+            height: 100vh;
+            overflow-y: auto; /* Allow scroll if content exceeds vertical height on small screens */
         }
+        
+        /* Compact Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 350px;
-            max-height: 400px;
+            height: 300px; /* Fixed height for dashboard feel */
+            max-height: 300px;
         }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
+
+        .tab-btn.active {
+            border-bottom: 2px solid #D4AF37;
+            color: #2C3E50;
+            font-weight: 600;
         }
-        .card-hover {
-            transition: all 0.3s ease;
+        .tab-btn {
+            color: #6B7280;
+            transition: all 0.2s;
         }
-        .card-hover:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .tab-btn:hover {
+            color: #2C3E50;
         }
-        .active-tab {
-            background-color: #2C3E50;
-            color: white;
-        }
-        .inactive-tab {
-            background-color: white;
-            color: #374151;
-            border: 1px solid #E5E7EB;
-        }
+
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.3s ease-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="font-sans antialiased">
+<body class="flex flex-col lg:h-screen lg:overflow-hidden">
 
-    <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <span class="text-xl font-bold font-serif text-primary">Gregory Sachs, PE</span>
-                    <span class="hidden md:block ml-4 text-sm text-gray-500 border-l pl-4 border-gray-300">Executive Leadership & NASA Candidate Analysis</span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <button onclick="scrollToSection('hero')" class="text-gray-600 hover:text-primary px-3 py-2 text-sm font-medium">Overview</button>
-                    <button onclick="scrollToSection('pillars')" class="text-gray-600 hover:text-primary px-3 py-2 text-sm font-medium">Strategic Pillars</button>
-                    <button onclick="scrollToSection('inventory')" class="text-gray-600 hover:text-primary px-3 py-2 text-sm font-medium">Strengths Inventory</button>
-                </div>
+    <!-- Header (Minimalist) -->
+    <header class="bg-white border-b border-gray-200 px-6 py-3 flex-none">
+        <div class="flex justify-between items-center max-w-8xl mx-auto w-full">
+            <div>
+                <h1 class="text-xl font-serif font-bold text-primary">Gregory Dennis Sachs, PE</h1>
+                <p class="text-xs text-gray-500 uppercase tracking-wide">Executive Leadership • Systems Engineering • Operational Resilience</p>
+            </div>
+            <div class="text-right hidden sm:block">
+                <p class="text-sm font-semibold text-accent">NASA Candidate Finalist</p>
+                <p class="text-xs text-gray-400">Mission XVI Commander</p>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section: The Executive Summary & Mastery Synthesis -->
-    <section id="hero" class="py-12 bg-primary text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-10">
-                <h1 class="text-4xl md:text-5xl font-serif font-bold mb-4 text-white">The Relentless Optimizer</h1>
-                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
-                    Bridging the gap between **Strategic Vision** (MIT/Executive) and **Tactical Resilience** (Navy Nuke/HERA). A "Translator" who speaks engineering, business, and policy fluently.
-                </p>
-            </div>
+    <!-- Main Dashboard Layout -->
+    <main class="flex-grow p-4 lg:p-6 bg-secondary overflow-y-auto lg:overflow-hidden">
+        <div class="max-w-8xl mx-auto w-full h-full grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            <!-- The Synthesis Triad -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mt-12">
-                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20">
-                    <div class="text-3xl mb-2">🧠</div>
-                    <h3 class="text-xl font-bold mb-2 text-accent">The Head</h3>
-                    <p class="text-sm text-gray-200">MIT Systems Thinker, Data Analyst, Policy Negotiator.</p>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20">
-                    <div class="text-3xl mb-2">🛠️</div>
-                    <h3 class="text-xl font-bold mb-2 text-accent">The Hands</h3>
-                    <p class="text-sm text-gray-200">Mechanic, Remodeler, Triathlete, Operator.</p>
-                </div>
-                <div class="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20">
-                    <div class="text-3xl mb-2">❤️</div>
-                    <h3 class="text-xl font-bold mb-2 text-accent">The Heart</h3>
-                    <p class="text-sm text-gray-200">Educator, Mentor, Stoic Leader, "Fixer" of people & sinks.</p>
-                </div>
-            </div>
-            
-            <div class="mt-8 text-center">
-                <blockquote class="text-lg italic text-gray-300 border-l-4 border-accent pl-4 inline-block text-left bg-black/20 p-4 rounded-r">
-                    "My greatest strength is my **relentless versatility**. I am as comfortable modeling complex systems in a spreadsheet as I am fixing a broken sink or navigating a difficult HR conversation."
-                </blockquote>
-            </div>
-        </div>
-    </section>
-
-    <!-- Part 1: Strategic Pillars (Interactive Radar) -->
-    <section id="pillars" class="py-16 bg-bg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-10">
-                <h2 class="text-3xl font-serif font-bold text-primary mb-2">Strategic Pillars</h2>
-                <p class="text-gray-600">The 5 core competencies defining the candidate's value proposition. Interact with the chart to explore specific evidence.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <!-- Col 1: Identity Sidebar (Fixed on Desktop) -->
+            <aside class="lg:col-span-3 space-y-4">
                 
-                <!-- Visualization Column -->
-                <div class="bg-white p-6 rounded-xl shadow-md">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-700">Competency Profile</h3>
-                        <span class="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Click points for details</span>
-                    </div>
-                    <!-- Chart Container -->
-                    <div class="chart-container">
-                        <canvas id="pillarsChart"></canvas>
+                <!-- Profile Card -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
+                    <div class="w-20 h-20 bg-primary text-white rounded-full flex items-center justify-center text-3xl mx-auto mb-4 font-serif">GS</div>
+                    <h2 class="text-lg font-bold text-gray-800">"The Relentless Optimizer"</h2>
+                    <p class="text-xs text-gray-500 mt-2 leading-relaxed">
+                        Bridging the gap between <strong>Strategic Vision</strong> (MIT/Executive) and <strong>Tactical Resilience</strong> (Navy Nuke/HERA).
+                    </p>
+                </div>
+
+                <!-- The Triad (Head/Hands/Heart) -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 border-b pb-2">Synthesis Profile</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <div class="text-xl mr-3 bg-gray-50 p-2 rounded">🧠</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-primary">The Head</h4>
+                                <p class="text-xs text-gray-500">MIT Systems Thinker, Policy Negotiator.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="text-xl mr-3 bg-gray-50 p-2 rounded">🛠️</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-primary">The Hands</h4>
+                                <p class="text-xs text-gray-500">Mechanic, Remodeler, Operator.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="text-xl mr-3 bg-gray-50 p-2 rounded">❤️</div>
+                            <div>
+                                <h4 class="text-sm font-bold text-primary">The Heart</h4>
+                                <p class="text-xs text-gray-500">Educator, Mentor, Stoic Leader.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Dynamic Content Column -->
-                <div id="pillar-details" class="bg-white p-8 rounded-xl shadow-md min-h-[400px] border-l-4 border-accent flex flex-col justify-center">
-                    <!-- Default Content -->
-                    <div class="text-center text-gray-500">
-                        <p class="text-6xl mb-4">👆</p>
-                        <h3 class="text-xl font-bold">Explore the Profile</h3>
-                        <p>Click on any point in the radar chart to view the detailed breakdown, evidence, and strategic conclusion for that pillar.</p>
+                 <!-- Contact / Status -->
+                 <div class="bg-primary text-white rounded-lg shadow-sm p-4 text-center">
+                    <p class="text-xs font-semibold opacity-75 uppercase tracking-wider">Current Status</p>
+                    <p class="text-sm font-bold mt-1">Available for Executive Roles</p>
+                </div>
+            </aside>
+
+            <!-- Col 2: Intelligence & Evidence (Main Content) -->
+            <section class="lg:col-span-9 flex flex-col gap-6 h-full overflow-hidden">
+                
+                <!-- Top Row: Strategy Visualization -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-none">
+                    
+                    <!-- Radar Chart Panel -->
+                    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-sm font-bold text-gray-700">Strategic Competencies</h3>
+                            <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded">Interactive</span>
+                        </div>
+                        <div class="chart-container flex-grow flex items-center justify-center">
+                            <canvas id="pillarsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Intelligence Panel -->
+                    <div id="intelligence-panel" class="bg-white rounded-lg shadow-sm border-l-4 border-accent p-6 flex flex-col justify-center relative overflow-hidden">
+                         <!-- Content injected by JS -->
+                         <div class="text-center">
+                             <h3 class="text-lg font-serif font-bold text-primary mb-2">Executive Intelligence</h3>
+                             <p class="text-sm text-gray-500">Select a competency on the radar chart to view strategic conclusions and evidence.</p>
+                             <div class="mt-4 inline-block text-4xl animate-bounce">👆</div>
+                         </div>
                     </div>
                 </div>
-            </div>
+
+                <!-- Bottom Row: Capabilities Matrix (Tabbed) -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow overflow-hidden">
+                    
+                    <!-- Tabs Header -->
+                    <div class="flex items-center px-6 py-3 border-b border-gray-100 bg-gray-50/50 space-x-6">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Strengths Inventory:</span>
+                        <button onclick="switchTab('cognitive')" class="tab-btn active text-sm pb-1 px-1">Cognitive & Analytical</button>
+                        <button onclick="switchTab('operational')" class="tab-btn text-sm pb-1 px-1">Operational & Execution</button>
+                        <button onclick="switchTab('character')" class="tab-btn text-sm pb-1 px-1">Character & Grit</button>
+                    </div>
+
+                    <!-- Scrollable List Content -->
+                    <div id="inventory-list" class="flex-grow overflow-y-auto p-4 lg:p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 content-start">
+                        <!-- Items injected by JS -->
+                    </div>
+                </div>
+
+            </section>
         </div>
-    </section>
-
-    <!-- Part 2: Comprehensive Strengths Inventory -->
-    <section id="inventory" class="py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-10 text-center">
-                <h2 class="text-3xl font-serif font-bold text-primary mb-4">Comprehensive Strengths Inventory</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">A detailed categorization of specific traits into actionable professional domains.</p>
-            </div>
-
-            <!-- Filter Buttons -->
-            <div class="flex justify-center flex-wrap gap-4 mb-10">
-                <button onclick="filterInventory('all')" class="inventory-btn active-tab px-6 py-2 rounded-full font-semibold text-sm transition-colors">All Strengths</button>
-                <button onclick="filterInventory('cognitive')" class="inventory-btn inactive-tab px-6 py-2 rounded-full font-semibold text-sm transition-colors hover:bg-gray-50">Cognitive & Analytical</button>
-                <button onclick="filterInventory('operational')" class="inventory-btn inactive-tab px-6 py-2 rounded-full font-semibold text-sm transition-colors hover:bg-gray-50">Operational & Execution</button>
-                <button onclick="filterInventory('character')" class="inventory-btn inactive-tab px-6 py-2 rounded-full font-semibold text-sm transition-colors hover:bg-gray-50">Character & Grit</button>
-            </div>
-
-            <!-- Inventory Grid -->
-            <div id="inventory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Items injected by JS -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-primary text-gray-400 py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p class="font-serif text-xl text-white mb-2">Gregory Dennis Sachs, PE</p>
-            <p class="text-sm mb-4">Executive Leadership • Systems Engineering • Operational Resilience</p>
-            <div class="w-16 h-1 bg-accent mx-auto mb-4 rounded"></div>
-            <p class="text-xs">Generated from Professional Strengths Analysis for NASA Astronaut Selection Prep</p>
-        </div>
-    </footer>
+    </main>
 
     <!-- Scripts -->
     <script>
-        // Data Objects based on Report
+        // --- Data Source ---
         const pillarsData = [
             {
                 id: 'crisis',
-                title: 'Elite Crisis Leadership & Resilience',
+                title: 'Crisis Leadership', // Shortened title
+                fullTitle: 'Elite Crisis Leadership & Resilience',
                 subtitle: 'The "Commander" Factor',
                 score: 95,
-                conclusion: 'You possess "Stoic Operational Calm." You can decouple emotional panic from logical decision-making in real-time. This is not just "bravery"; it is a disciplined, practiced cognitive skill.',
+                conclusion: 'You possess "Stoic Operational Calm." You can decouple emotional panic from logical decision-making in real-time. A disciplined, practiced cognitive skill.',
                 evidence: [
-                    '**HERA Mission XVI Commander:** Managed crew psychology, sleep deprivation, and isolation for 45 days with highest team coordination scores.',
-                    '**Maritime Casualties:** Led response to electrical fire (restoring power) and un-isolable engine room flooding in heavy seas.',
-                    '**Disaster Recovery:** Led EmPower Solar’s response to Hurricane Sandy (rebuilding office/fleet) and COVID-19 contingency.'
+                    '**HERA Mission XVI Commander:** Managed crew psychology & isolation for 45 days.',
+                    '**Maritime Casualties:** Led response to electrical fire & engine room flooding.',
+                    '**Disaster Recovery:** Led EmPower Solar’s response to Hurricane Sandy.'
                 ]
             },
             {
                 id: 'scaling',
-                title: 'Full-Spectrum Organizational Scaling',
+                title: 'Organizational Scaling', // Shortened title
+                fullTitle: 'Full-Spectrum Organizational Scaling',
                 subtitle: 'The "Organizational Architect"',
                 score: 90,
-                conclusion: 'You understand that a company is a complex system of human and technical variables. You can diagnose inefficiencies and scale solutions without breaking the underlying culture.',
+                conclusion: 'You understand that a company is a complex system. You can diagnose inefficiencies and scale solutions without breaking the underlying culture.',
                 evidence: [
                     '**Scaled EmPower Solar:** Grew from 3 to 150+ staff and $30M+ revenue.',
-                    '**Systems Architect:** Created "STOCKED" culture framework and foundational HR/Safety operating systems.',
-                    '**Digital Infrastructure:** Built ERP system from ground up and custom field data apps.',
-                    '**Capital:** Secured $5M growth capital; managed HQ and warehouse relocations.'
+                    '**Systems Architect:** Created "STOCKED" culture framework.',
+                    '**Digital Infrastructure:** Built ERP system & custom field apps.'
                 ]
             },
             {
                 id: 'diplomacy',
-                title: 'Technical-Political Diplomacy',
+                title: 'Technical Diplomacy', // Shortened title
+                fullTitle: 'Technical-Political Diplomacy',
                 subtitle: 'The "Technical Diplomat"',
                 score: 85,
-                conclusion: 'Most engineers struggle with policy, and policymakers don\'t understand engineering. You thrive in this gap, translating technical necessities into successful regulatory frameworks.',
+                conclusion: 'You thrive in the gap between engineering and policy, translating technical necessities into successful regulatory frameworks.',
                 evidence: [
-                    '**Coalition Builder:** Founder of NY Metropolitan Sustainable Energy Consortium (NYM-SEC).',
-                    '**Policy Negotiator:** NYS Industry Liaison for Dept. of Public Service ITWG (Grid Modernization).',
-                    '**Trade Leadership:** Founding Officer of Long Island Solar Energy Industries Association (LI-SEIA).'
+                    '**Coalition Builder:** Founder of NYM-SEC Consortium.',
+                    '**Policy Negotiator:** NYS Industry Liaison for Grid Modernization.',
+                    '**Trade Leadership:** Founding Officer of LI-SEIA.'
                 ]
             },
             {
                 id: 'polymath',
-                title: 'The Pragmatic Polymath',
+                title: 'Pragmatic Polymath', // Shortened title
+                fullTitle: 'The Pragmatic Polymath',
                 subtitle: 'Systems + Hands',
                 score: 92,
                 conclusion: 'You have "High-Fidelity Technical Intuition." Because you have physically manipulated machinery, your high-level system designs are grounded in reality.',
                 evidence: [
-                    '**MIT Systems Design:** Master’s thesis on "Electricity Grid 2.0" architectures.',
-                    '**Operational Grit:** "Knuckle-busting" 3rd Assistant Engineer (rebuilding pumps at sea).',
-                    '**Renovation:** Personally gutted/rebuilt 3-family home while working as Nuclear Engineer.',
-                    '**Rapid Adaptation:** "Fast-twitch" mastery of new tools like AI workflows.'
+                    '**MIT Systems Design:** Thesis on "Electricity Grid 2.0".',
+                    '**Operational Grit:** 3rd Assistant Engineer (rebuilding pumps at sea).',
+                    '**Rapid Adaptation:** Mastery of AI workflows.'
                 ]
             },
             {
                 id: 'pedagogy',
-                title: 'Pedagogical Influence',
-                subtitle: 'Force-Multiplication Leadership',
+                title: 'Pedagogical Influence', // Shortened title
+                fullTitle: 'Pedagogical Influence',
+                subtitle: 'Force-Multiplication',
                 score: 80,
                 conclusion: 'You don\'t just hoard knowledge; you systemize it and transfer it to others, making the entire team more capable.',
                 evidence: [
-                    '**Academic Tenure:** Distinguished Tenure-track Professor at USMMA.',
-                    '**Curriculum Design:** Created Alternative Power Program (APP) and hands-on labs.',
-                    '**Public Voice:** Featured on PBS "This Old House", DIY Network, and industry keynotes.'
+                    '**Academic Tenure:** Distinguished Professor at USMMA.',
+                    '**Curriculum:** Created Alternative Power Program (APP).',
+                    '**Public Voice:** Featured on PBS "This Old House".'
                 ]
             }
         ];
 
         const inventoryData = [
             // Cognitive
-            { category: 'cognitive', title: 'Rapid Tech Adaptation', desc: '"Fast-twitch" learning capability (e.g., AI integration). Tools are force-multipliers.' },
+            { category: 'cognitive', title: 'Rapid Tech Adaptation', desc: '"Fast-twitch" learning capability (e.g., AI integration).' },
             { category: 'cognitive', title: 'Abstract Deconstruction', desc: 'Unpacking massive goals into granular engineering checklists.' },
             { category: 'cognitive', title: 'Data-Driven Precision', desc: 'Master at spreadsheets/analytics. Modeling signal from noise.' },
             { category: 'cognitive', title: 'Extreme Detail', desc: 'Zero-defect mentality (Nuclear/Financial standards).' },
-            { category: 'cognitive', title: 'Systems Thinking', desc: 'Analyzing feedback loops and tradeoffs to optimize the *whole* architecture.' },
+            { category: 'cognitive', title: 'Systems Thinking', desc: 'Analyzing feedback loops to optimize the *whole* architecture.' },
             { category: 'cognitive', title: 'Insatiable Curiosity', desc: 'Learning engine that constantly seeks the adjacent possible.' },
             // Operational
-            { category: 'operational', title: 'Non-Linear Problem Solver', desc: 'Universal wrench: Solving broken sinks and HR disputes with equal facility.' },
-            { category: 'operational', title: 'Procedural Mastery', desc: 'Writing and optimizing procedures for safety-critical environments.' },
+            { category: 'operational', title: 'Non-Linear Solver', desc: 'Universal wrench: Solving broken sinks and HR disputes.' },
+            { category: 'operational', title: 'Procedural Mastery', desc: 'Writing procedures for safety-critical environments.' },
             { category: 'operational', title: 'Execution Accuracy', desc: 'Finishing the goal with precision. No loose ends.' },
-            { category: 'operational', title: 'Followership', desc: 'Supportive, disciplined team player when the mission requires it.' },
+            { category: 'operational', title: 'Followership', desc: 'Supportive, disciplined team player when required.' },
             // Character
-            { category: 'character', title: 'Dual-Domain Endurance', desc: 'Strong Body/Strong Mind. 3 Marathons, 3 Half Ironmans, Manual Labor + MIT Thesis.' },
-            { category: 'character', title: 'Optimistic Reframing', desc: 'Reframing obstacles as engineering constraints to be solved.' },
+            { category: 'character', title: 'Dual-Domain Endurance', desc: '3 Marathons, 3 Half Ironmans, Manual Labor + MIT Thesis.' },
+            { category: 'character', title: 'Optimistic Reframing', desc: 'Reframing obstacles as engineering constraints.' },
             { category: 'character', title: 'Sustained Grit', desc: 'Weathering 20 years of ups and downs without quitting.' },
-            { category: 'character', title: 'Stoic Resilience', desc: 'Emotional stability through highs and lows. The "keel" of the ship.' },
-            { category: 'character', title: 'Goal-Oriented Discipline', desc: 'Internal discipline to set targets and stick to them.' }
+            { category: 'character', title: 'Stoic Resilience', desc: 'Emotional stability through highs and lows.' },
+            { category: 'character', title: 'Goal Discipline', desc: 'Internal discipline to set targets and stick to them.' }
         ];
 
-        // Chart Initialization
+        // --- Logic ---
+
+        // 1. Chart
         let radarChart;
-
-        document.addEventListener('DOMContentLoaded', () => {
-            initChart();
-            renderInventory('all');
-        });
-
         function initChart() {
             const ctx = document.getElementById('pillarsChart').getContext('2d');
-            
             radarChart = new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: pillarsData.map(p => p.title.split(' ').slice(0, 2).join(' ')), // Short labels
+                    labels: pillarsData.map(p => p.title),
                     datasets: [{
-                        label: 'Proficiency Score',
+                        label: 'Proficiency',
                         data: pillarsData.map(p => p.score),
-                        backgroundColor: 'rgba(212, 175, 55, 0.2)', // Accent color low opacity
-                        borderColor: '#D4AF37', // Accent Color
-                        pointBackgroundColor: '#2C3E50', // Primary Color
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#D4AF37',
+                        backgroundColor: 'rgba(212, 175, 55, 0.15)', // Accent low opacity
+                        borderColor: '#D4AF37', // Accent
                         borderWidth: 2,
-                        pointRadius: 5,
-                        pointHoverRadius: 8
+                        pointBackgroundColor: '#2C3E50', // Primary
+                        pointRadius: 4,
+                        pointHoverRadius: 6
                     }]
                 },
                 options: {
@@ -340,117 +332,101 @@
                     maintainAspectRatio: false,
                     scales: {
                         r: {
-                            angleLines: { color: 'rgba(0,0,0,0.1)' },
-                            grid: { color: 'rgba(0,0,0,0.1)' },
-                            pointLabels: {
-                                font: { size: 12, family: 'Inter', weight: '600' },
-                                color: '#374151'
-                            },
+                            ticks: { display: false, maxTicksLimit: 1 }, // Clean look
+                            pointLabels: { font: { size: 11, family: 'Inter', weight: '600' }, color: '#4B5563' },
+                            grid: { color: '#E5E7EB' },
+                            angleLines: { color: '#E5E7EB' },
                             suggestedMin: 50,
-                            suggestedMax: 100,
-                            ticks: { display: false }
+                            suggestedMax: 100
                         }
                     },
                     plugins: {
                         legend: { display: false },
-                        tooltip: { enabled: false } // Custom click handling instead
+                        tooltip: { enabled: false } // We use the panel instead
                     },
-                    onClick: (event, elements) => {
-                        if (elements.length > 0) {
-                            const index = elements[0].index;
-                            updatePillarDetails(index);
-                        }
+                    onClick: (e, els) => {
+                        if (els.length > 0) updatePanel(els[0].index);
                     },
-                    onHover: (event, chartElement) => {
-                        event.native.target.style.cursor = chartElement.length ? 'pointer' : 'default';
+                    onHover: (e, els) => {
+                        e.native.target.style.cursor = els.length ? 'pointer' : 'default';
                     }
                 }
             });
+            
+            // Set default view to first item
+            updatePanel(0);
         }
 
-        function updatePillarDetails(index) {
+        // 2. Dynamic Intelligence Panel
+        function updatePanel(index) {
             const data = pillarsData[index];
-            const container = document.getElementById('pillar-details');
+            const panel = document.getElementById('intelligence-panel');
             
-            // Fade effect
-            container.classList.remove('fade-in');
-            void container.offsetWidth; // Trigger reflow
-            container.classList.add('fade-in');
+            // Re-trigger animation
+            panel.classList.remove('fade-in');
+            void panel.offsetWidth;
+            panel.classList.add('fade-in');
 
-            let evidenceHTML = data.evidence.map(item => {
-                // Formatting bold text
-                const formatted = item.replace(/\*\*(.*?)\*\*/g, '<span class="font-semibold text-primary">$1</span>');
-                return `<li class="mb-2 pl-4 border-l-2 border-gray-200 text-sm">${formatted}</li>`;
+            const evidenceList = data.evidence.map(e => {
+                const text = e.replace(/\*\*(.*?)\*\*/g, '<span class="font-bold text-primary">$1</span>');
+                return `<li class="text-xs text-gray-600 pl-3 border-l-2 border-gray-200 mb-1 leading-relaxed">${text}</li>`;
             }).join('');
 
-            container.innerHTML = `
-                <div>
-                    <h3 class="text-2xl font-serif font-bold text-primary mb-1">${data.title}</h3>
-                    <p class="text-accent font-semibold mb-6 text-lg">${data.subtitle}</p>
+            panel.innerHTML = `
+                <div class="h-full flex flex-col">
+                    <div class="flex-none mb-3">
+                        <h3 class="text-xl font-serif font-bold text-primary">${data.fullTitle}</h3>
+                        <p class="text-xs font-bold text-accent uppercase tracking-wider">${data.subtitle}</p>
+                    </div>
                     
-                    <div class="mb-6 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                        <p class="italic text-gray-700">"${data.conclusion}"</p>
+                    <div class="flex-grow bg-gray-50 rounded p-3 mb-3 border border-gray-100 overflow-y-auto">
+                        <p class="text-sm text-gray-700 italic leading-relaxed">"${data.conclusion}"</p>
                     </div>
 
-                    <div>
-                        <h4 class="font-bold text-gray-900 mb-3 uppercase tracking-wider text-xs">Key Evidence</h4>
-                        <ul class="text-gray-600 space-y-2">
-                            ${evidenceHTML}
+                    <div class="flex-none">
+                        <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Strategic Evidence</h4>
+                        <ul class="space-y-1">
+                            ${evidenceList}
                         </ul>
                     </div>
                 </div>
             `;
         }
 
-        // Inventory Filtering
-        function filterInventory(category) {
+        // 3. Tabbed Inventory
+        function switchTab(category) {
             // Update Buttons
-            const buttons = document.querySelectorAll('.inventory-btn');
-            buttons.forEach(btn => {
-                if (btn.textContent.toLowerCase().includes(category) || (category === 'all' && btn.textContent.includes('All'))) {
-                    btn.classList.remove('inactive-tab', 'hover:bg-gray-50');
-                    btn.classList.add('active-tab');
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if(btn.textContent.toLowerCase().includes(category.split(' ')[0])) {
+                    btn.classList.add('active');
                 } else {
-                    btn.classList.add('inactive-tab', 'hover:bg-gray-50');
-                    btn.classList.remove('active-tab');
+                    btn.classList.remove('active');
                 }
             });
 
-            renderInventory(category);
-        }
-
-        function renderInventory(filter) {
-            const grid = document.getElementById('inventory-grid');
-            grid.innerHTML = '';
+            // Update List
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = '';
             
-            const filteredData = filter === 'all' ? inventoryData : inventoryData.filter(i => i.category === filter);
-
-            filteredData.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'bg-white border border-gray-200 p-6 rounded-lg card-hover fade-in';
-                
-                let icon = '🔹';
-                if(item.category === 'cognitive') icon = '🧠';
-                if(item.category === 'operational') icon = '⚙️';
-                if(item.category === 'character') icon = '🔥';
-
-                card.innerHTML = `
-                    <div class="flex items-start mb-3">
-                        <span class="text-2xl mr-3">${icon}</span>
-                        <div>
-                            <h4 class="font-bold text-gray-800">${item.title}</h4>
-                            <span class="text-xs uppercase text-gray-400 tracking-wider font-semibold">${item.category}</span>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-600 leading-relaxed">${item.desc}</p>
+            const items = inventoryData.filter(i => i.category === category);
+            
+            items.forEach(item => {
+                const el = document.createElement('div');
+                el.className = 'bg-white border border-gray-100 p-3 rounded hover:shadow-sm transition-shadow fade-in';
+                el.innerHTML = `
+                    <h5 class="text-sm font-bold text-gray-800 mb-1">${item.title}</h5>
+                    <p class="text-xs text-gray-500 leading-snug">${item.desc}</p>
                 `;
-                grid.appendChild(card);
+                list.appendChild(el);
             });
         }
 
-        function scrollToSection(id) {
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
-        }
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            switchTab('cognitive'); // Default tab
+        });
+
     </script>
 </body>
 </html>
