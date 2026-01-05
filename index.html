@@ -71,8 +71,8 @@
         .chart-container {
             position: relative;
             width: 100%;
-            height: 300px; /* Fixed height for dashboard feel */
-            max-height: 300px;
+            height: 280px; /* slightly reduced to accommodate new text */
+            max-height: 280px;
         }
 
         .tab-btn.active {
@@ -173,9 +173,14 @@
                     
                     <!-- Radar Chart Panel -->
                     <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 flex flex-col">
-                        <div class="flex justify-between items-center mb-2">
-                            <h3 class="text-sm font-bold text-gray-700">Strategic Competencies</h3>
-                            <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded">Interactive</span>
+                        <div class="flex flex-col mb-2">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-sm font-bold text-gray-700">Strategic Competencies</h3>
+                                <span class="text-[10px] bg-gray-100 text-gray-500 px-2 py-1 rounded">Interactive</span>
+                            </div>
+                            <p class="text-xs text-accent mt-1 flex items-center gap-1">
+                                <span class="text-lg">👆</span> Select a node on the chart to view strategic evidence
+                            </p>
                         </div>
                         <div class="chart-container flex-grow flex items-center justify-center">
                             <canvas id="pillarsChart"></canvas>
@@ -197,9 +202,10 @@
                 <div class="bg-white rounded-lg shadow-sm border border-gray-200 flex flex-col flex-grow overflow-hidden">
                     
                     <!-- Tabs Header -->
-                    <div class="flex items-center px-6 py-3 border-b border-gray-100 bg-gray-50/50 space-x-6">
-                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2">Strengths Inventory:</span>
-                        <button onclick="switchTab('cognitive')" class="tab-btn active text-sm pb-1 px-1">Cognitive & Analytical</button>
+                    <div class="flex items-center px-6 py-3 border-b border-gray-100 bg-gray-50/50 space-x-6 overflow-x-auto whitespace-nowrap">
+                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wider mr-2 hidden sm:inline">Strengths Inventory:</span>
+                        <button onclick="switchTab('all')" class="tab-btn active text-sm pb-1 px-1">All Strengths</button>
+                        <button onclick="switchTab('cognitive')" class="tab-btn text-sm pb-1 px-1">Cognitive & Analytical</button>
                         <button onclick="switchTab('operational')" class="tab-btn text-sm pb-1 px-1">Operational & Execution</button>
                         <button onclick="switchTab('character')" class="tab-btn text-sm pb-1 px-1">Character & Grit</button>
                     </div>
@@ -397,7 +403,15 @@
         function switchTab(category) {
             // Update Buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                if(btn.textContent.toLowerCase().includes(category.split(' ')[0])) {
+                const btnText = btn.textContent.toLowerCase();
+                const catLower = category.toLowerCase();
+                
+                // Match based on category start (e.g. 'cognitive' matches 'Cognitive & Analytical')
+                // Special case for 'all' matching 'All Strengths'
+                const match = (catLower === 'all' && btnText.includes('all')) || 
+                              (catLower !== 'all' && btnText.includes(catLower.split(' ')[0]) && !btnText.includes('all'));
+
+                if(match) {
                     btn.classList.add('active');
                 } else {
                     btn.classList.remove('active');
@@ -408,7 +422,7 @@
             const list = document.getElementById('inventory-list');
             list.innerHTML = '';
             
-            const items = inventoryData.filter(i => i.category === category);
+            const items = category === 'all' ? inventoryData : inventoryData.filter(i => i.category === category);
             
             items.forEach(item => {
                 const el = document.createElement('div');
@@ -424,7 +438,7 @@
         // Init
         document.addEventListener('DOMContentLoaded', () => {
             initChart();
-            switchTab('cognitive'); // Default tab
+            switchTab('all'); // Default tab changed to 'all'
         });
 
     </script>
